@@ -1,0 +1,5 @@
+coverage.out
+coverage-*.out
+*.env
+!(test.env)
+profile.cov

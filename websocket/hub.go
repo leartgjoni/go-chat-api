@@ -22,6 +22,7 @@ func (s *HubService) Run(h *app.Hub) {
 				h.Rooms[client.Room] = make(map[*app.Client]bool)
 			}
 			h.Rooms[client.Room][client] = true
+			//client.Send <- []byte("hello from server")
 		case client := <-h.Unregister:
 			clients := h.Rooms[client.Room]
 			if _, ok := clients[client]; ok {

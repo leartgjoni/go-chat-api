@@ -13,5 +13,5 @@ type Hub struct {
 }
 
 type HubService interface {
-	Run(channel *Hub)
+	Run(hub *Hub)
 }

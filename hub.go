@@ -1,8 +1,11 @@
 package app
 
 type Message struct {
-	Data []byte
-	Room string
+	UserID string `json:"userId"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+	Data string `json:"data"`
+	Room string `json:"-"`
 }
 
 type Hub struct {

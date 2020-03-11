@@ -52,7 +52,10 @@ func (s *ClientService) ReadPump(c *app.Client) {
 		}
 
 		c.Hub.Broadcast <- app.Message{
-			Data: message,
+			UserID: c.ID,
+			Name: c.Name,
+			Type: "message",
+			Data: string(message),
 			Room: c.Room,
 		}
 	}

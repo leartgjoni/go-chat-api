@@ -1,6 +1,8 @@
 package websocket
 
 import (
+	"encoding/json"
+	"fmt"
 	app "github.com/leartgjoni/go-chat-api"
 )
 
@@ -35,8 +37,18 @@ func (s *HubService) Run(h *app.Hub) {
 		case message := <-h.Broadcast:
 			clients := h.Rooms[message.Room]
 			for client := range clients {
+				if message.UserID == client.ID {
+					continue
+				}
+
+				jsonMsg, err := json.Marshal(message)
+				if err != nil {
+					fmt.Println("err parsing json", err)
+					return
+				}
+
 				select {
-				case client.Send <- message.Data:
+				case client.Send <- jsonMsg:
 				default:
 					// Send chan close
 					close(client.Send)

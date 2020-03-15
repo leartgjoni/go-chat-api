@@ -10,6 +10,7 @@ type Server struct {
 	ln net.Listener
 
 	// Services
+	PubSubService app.PubSubService
 	ClientService app.ClientService
 	HubService    app.HubService
 
@@ -61,6 +62,7 @@ func (s *Server) initializeHandlers() {
 	}
 
 	go s.HubService.Run(hub)
+	go s.PubSubService.Subscribe(hub)
 
 	s.websocketHandler = NewWebsocketHandler(s.ClientService, hub)
 }

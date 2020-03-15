@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/leartgjoni/go-chat-api/http"
 	"github.com/leartgjoni/go-chat-api/redis"
 	"github.com/leartgjoni/go-chat-api/websocket"
@@ -36,6 +37,7 @@ func main() {
 
 // Main represents the main program execution.
 type Main struct {
+	NodeId string
 	ConfigPath string
 	Config     Config
 
@@ -50,6 +52,7 @@ type Main struct {
 // NewMain returns a new instance of Main.
 func NewMain() *Main {
 	return &Main{
+		NodeId: uuid.New().String(),
 		Stdin:  os.Stdin,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
@@ -80,6 +83,7 @@ func (m *Main) LoadConfig() error {
 	m.Config = Config{
 		RedisAddr: viper.GetString("REDIS_ADDR"),
 		RedisPassword: viper.GetString("REDIS_PASSWORD"),
+		Port: viper.GetString("PORT"),
 	}
 
 	return nil
@@ -92,15 +96,17 @@ func (m *Main) Run() error {
 		os.Exit(1)
 	}
 
-	roomService := redis.NewRoomService(redisDb)
+	roomService := redis.NewRoomService(redisDb, m.NodeId)
+	pubsubService := redis.NewPubSubService(redisDb, m.NodeId)
 
-	clientService := websocket.NewClientService()
+	clientService := websocket.NewClientService(m.NodeId)
 	hubService := websocket.NewHubService(roomService)
 
 	// Initialize Http server.
 	httpServer := http.NewServer()
-	httpServer.Addr = ":8080"
+	httpServer.Addr = fmt.Sprintf(":%s", m.Config.Port)
 
+	httpServer.PubSubService = pubsubService
 	httpServer.ClientService = clientService
 	httpServer.HubService = hubService
 
@@ -123,4 +129,5 @@ func (m *Main) Run() error {
 type Config struct {
 	RedisAddr string
 	RedisPassword string
+	Port string
 }

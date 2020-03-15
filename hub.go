@@ -4,7 +4,8 @@ type Message struct {
 	UserID string `json:"userId"`
 	Type string `json:"type"`
 	Data string `json:"data"`
-	Room string `json:"-"`
+	Room string `json:"room"`
+	NodeId string `json:"nodeId"`
 }
 
 type Hub struct {

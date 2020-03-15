@@ -11,11 +11,13 @@ var _ app.RoomService = &RoomService{}
 
 type RoomService struct {
 	db *DB
+	NodeId string
 }
 
-func NewRoomService(db *DB) *RoomService {
+func NewRoomService(db *DB, NodeId string) *RoomService {
 	return &RoomService{
 		db: db,
+		NodeId: NodeId,
 	}
 }
 
@@ -50,6 +52,22 @@ func (s RoomService) PersistAndBroadcast(c *app.Client, action app.Action) {
 			Type: "user:list",
 			Data: string(jsonClientsList),
 			Room: c.Room,
+			NodeId: s.NodeId,
 		}
 	}()
+}
+
+func (s RoomService) BroadcastMessage(message app.Message) {
+	if message.NodeId != s.NodeId {
+		return
+	}
+
+	jsonMessage, err := json.Marshal(message)
+
+	if err != nil {
+		fmt.Println("err parsing json", err)
+		return
+	}
+
+	s.db.Publish("room-messages", string(jsonMessage))
 }

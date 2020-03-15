@@ -41,6 +41,9 @@ func (s *HubService) Run(h *app.Hub) {
 				s.RoomService.PersistAndBroadcast(client, app.ActionUnregister)
 			}
 		case message := <-h.Broadcast:
+			fmt.Println("broadcast")
+			s.RoomService.BroadcastMessage(message)
+
 			clients := h.Rooms[message.Room]
 			for client := range clients {
 				if message.UserID == client.ID {

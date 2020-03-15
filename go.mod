@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/go-redis/redis/v7 v7.2.0
+	github.com/google/uuid v1.1.1
 	github.com/gorilla/websocket v1.4.0
 	github.com/spf13/viper v1.6.2
 	golang.org/x/net v0.0.0-20200222125558-5a598a2470a0 // indirect

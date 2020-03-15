@@ -9,5 +9,9 @@ const (
 
 type RoomService interface {
 	PersistAndBroadcast(c *Client, a Action)
+	BroadcastMessage(m Message)
 }
 
+type PubSubService interface {
+	Subscribe(hub *Hub)
+}

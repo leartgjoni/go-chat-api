@@ -28,10 +28,12 @@ var (
 // Ensure service implements interface.
 var _ app.ClientService = &ClientService{}
 
-type ClientService struct{}
+type ClientService struct{
+	NodeId string
+}
 
-func NewClientService() *ClientService {
-	return &ClientService{}
+func NewClientService(NodeId string) *ClientService {
+	return &ClientService{NodeId: NodeId}
 }
 
 func (s *ClientService) ReadPump(c *app.Client) {
@@ -56,6 +58,7 @@ func (s *ClientService) ReadPump(c *app.Client) {
 			Type: "message",
 			Data: string(data),
 			Room: c.Room,
+			NodeId: s.NodeId,
 		}
 	}
 }

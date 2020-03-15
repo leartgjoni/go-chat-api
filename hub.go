@@ -2,7 +2,6 @@ package app
 
 type Message struct {
 	UserID string `json:"userId"`
-	Name string `json:"name"`
 	Type string `json:"type"`
 	Data string `json:"data"`
 	Room string `json:"-"`

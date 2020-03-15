@@ -45,8 +45,9 @@ func (s *HubService) Run(h *app.Hub) {
 			// sending to channel is blocking until the channel reads, but the channel can read only if the loop continues.
 			// so we send to the channel from another goroutine, allowing the loop to continue
 			go func() {
+				// no client because we want to send to everybody in the room, include the client
 				client.Hub.Broadcast <- app.Message{
-					Type: "user-update",
+					Type: "user:list",
 					Data: string(jsonClients),
 					Room: client.Room,
 				}
@@ -61,7 +62,6 @@ func (s *HubService) Run(h *app.Hub) {
 				}
 			}
 		case message := <-h.Broadcast:
-			fmt.Print("here", message)
 			clients := h.Rooms[message.Room]
 			for client := range clients {
 				if message.UserID == client.ID {

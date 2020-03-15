@@ -1,0 +1,7 @@
+version: '3'
+services:
+  postgres:
+    container_name: redis
+    image: 'redis'
+    ports:
+      - 6380:6379

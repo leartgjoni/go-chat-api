@@ -10,10 +10,13 @@ import (
 var _ app.HubService = &HubService{}
 
 type HubService struct {
+	RoomService app.RoomService
 }
 
-func NewHubService() *HubService {
-	return &HubService{}
+func NewHubService(rs app.RoomService) *HubService {
+	return &HubService{
+		RoomService: rs,
+	}
 }
 
 func (s *HubService) Run(h *app.Hub) {
@@ -25,33 +28,7 @@ func (s *HubService) Run(h *app.Hub) {
 			}
 			h.Rooms[client.Room][client] = true
 
-			// send everybody the list of all users
-			type StaticUser struct {
-				Name string `json:"name"`
-				Id string `json:"id"`
-			}
-			var clients []StaticUser
-			for client := range h.Rooms[client.Room] {
-				clients = append(clients, StaticUser{Name: client.Name, Id: client.ID})
-			}
-			fmt.Println("all users", clients)
-
-			jsonClients, err := json.Marshal(clients)
-			if err != nil {
-				fmt.Println("err parsing json", err)
-				return
-			}
-
-			// sending to channel is blocking until the channel reads, but the channel can read only if the loop continues.
-			// so we send to the channel from another goroutine, allowing the loop to continue
-			go func() {
-				// no client because we want to send to everybody in the room, include the client
-				client.Hub.Broadcast <- app.Message{
-					Type: "user:list",
-					Data: string(jsonClients),
-					Room: client.Room,
-				}
-			}()
+			s.RoomService.PersistAndBroadcast(client, app.ActionRegister)
 		case client := <-h.Unregister:
 			clients := h.Rooms[client.Room]
 			if _, ok := clients[client]; ok {
@@ -60,6 +37,8 @@ func (s *HubService) Run(h *app.Hub) {
 				if len(clients) == 0 {
 					delete(h.Rooms, client.Room)
 				}
+
+				s.RoomService.PersistAndBroadcast(client, app.ActionUnregister)
 			}
 		case message := <-h.Broadcast:
 			clients := h.Rooms[message.Room]

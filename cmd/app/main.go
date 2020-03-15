@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/leartgjoni/go-chat-api/http"
+	"github.com/leartgjoni/go-chat-api/redis"
 	"github.com/leartgjoni/go-chat-api/websocket"
 	"github.com/spf13/viper"
 	"io"
@@ -77,17 +78,24 @@ func (m *Main) LoadConfig() error {
 	}
 
 	m.Config = Config{
-		// Todo
+		RedisAddr: viper.GetString("REDIS_ADDR"),
+		RedisPassword: viper.GetString("REDIS_PASSWORD"),
 	}
 
 	return nil
 }
 
 func (m *Main) Run() error {
-	// Todo: connect db
+	redisDb, err := redis.Open(m.Config.RedisAddr, m.Config.RedisPassword)
+	if err != nil {
+		fmt.Println(m.Stderr, err)
+		os.Exit(1)
+	}
+
+	roomService := redis.NewRoomService(redisDb)
 
 	clientService := websocket.NewClientService()
-	hubService := websocket.NewHubService()
+	hubService := websocket.NewHubService(roomService)
 
 	// Initialize Http server.
 	httpServer := http.NewServer()
@@ -113,5 +121,6 @@ func (m *Main) Run() error {
 }
 
 type Config struct {
-	// Todo
+	RedisAddr string
+	RedisPassword string
 }

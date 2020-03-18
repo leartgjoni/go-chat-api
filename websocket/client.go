@@ -28,7 +28,7 @@ var (
 // Ensure service implements interface.
 var _ app.ClientService = &ClientService{}
 
-type ClientService struct{
+type ClientService struct {
 	NodeId string
 }
 
@@ -55,9 +55,9 @@ func (s *ClientService) ReadPump(c *app.Client) {
 
 		c.Hub.Broadcast <- app.Message{
 			UserID: c.ID,
-			Type: "message",
-			Data: string(data),
-			Room: c.Room,
+			Type:   "message",
+			Data:   string(data),
+			Room:   c.Room,
 			NodeId: s.NodeId,
 		}
 	}

@@ -21,13 +21,9 @@ func NewWebsocketHandler(cs app.ClientService, hub *app.Hub) *websocketHandler {
 }
 
 func (h *websocketHandler) Handle(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("WebSocket Endpoint Hit")
-
 	room := r.URL.Query().Get("room")
 	userName := r.URL.Query().Get("name")
 	userId := r.URL.Query().Get("id")
-
-	fmt.Println(userName, userId)
 
 	var upgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
@@ -44,7 +40,7 @@ func (h *websocketHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	client := &app.Client{
-		ID: userId,
+		ID:   userId,
 		Name: userName,
 		Room: room,
 		Conn: conn,

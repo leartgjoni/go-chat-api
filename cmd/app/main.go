@@ -37,7 +37,7 @@ func main() {
 
 // Main represents the main program execution.
 type Main struct {
-	NodeId string
+	NodeId     string // represents this process
 	ConfigPath string
 	Config     Config
 
@@ -81,9 +81,9 @@ func (m *Main) LoadConfig() error {
 	}
 
 	m.Config = Config{
-		RedisAddr: viper.GetString("REDIS_ADDR"),
+		RedisAddr:     viper.GetString("REDIS_ADDR"),
 		RedisPassword: viper.GetString("REDIS_PASSWORD"),
-		Port: viper.GetString("PORT"),
+		Port:          viper.GetString("PORT"),
 	}
 
 	return nil
@@ -97,7 +97,6 @@ func (m *Main) Run() error {
 	}
 
 	roomService := redis.NewRoomService(redisDb, m.NodeId)
-	pubsubService := redis.NewPubSubService(redisDb, m.NodeId)
 
 	clientService := websocket.NewClientService(m.NodeId)
 	hubService := websocket.NewHubService(roomService)
@@ -106,7 +105,6 @@ func (m *Main) Run() error {
 	httpServer := http.NewServer()
 	httpServer.Addr = fmt.Sprintf(":%s", m.Config.Port)
 
-	httpServer.PubSubService = pubsubService
 	httpServer.ClientService = clientService
 	httpServer.HubService = hubService
 
@@ -119,7 +117,7 @@ func (m *Main) Run() error {
 	// Assign close function.
 	m.closeFn = func() error {
 		_ = httpServer.Close()
-		// Todo: close db
+		_ = redisDb.Close()
 		return nil
 	}
 
@@ -127,7 +125,7 @@ func (m *Main) Run() error {
 }
 
 type Config struct {
-	RedisAddr string
+	RedisAddr     string
 	RedisPassword string
-	Port string
+	Port          string
 }

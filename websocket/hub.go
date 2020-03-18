@@ -23,13 +23,19 @@ func (s *HubService) Run(h *app.Hub) {
 	for {
 		select {
 		case client := <-h.Register:
+			h.Mux.Lock()
+
 			if h.Rooms[client.Room] == nil {
 				h.Rooms[client.Room] = make(map[*app.Client]bool)
 			}
 			h.Rooms[client.Room][client] = true
 
-			s.RoomService.PersistAndBroadcast(client, app.ActionRegister)
+			h.Mux.Unlock()
+
+			s.RoomService.Update(client, app.ActionRegister)
 		case client := <-h.Unregister:
+			h.Mux.Lock()
+
 			clients := h.Rooms[client.Room]
 			if _, ok := clients[client]; ok {
 				delete(clients, client)
@@ -38,11 +44,12 @@ func (s *HubService) Run(h *app.Hub) {
 					delete(h.Rooms, client.Room)
 				}
 
-				s.RoomService.PersistAndBroadcast(client, app.ActionUnregister)
+				s.RoomService.Update(client, app.ActionUnregister)
 			}
+
+			h.Mux.Unlock()
 		case message := <-h.Broadcast:
-			fmt.Println("broadcast")
-			s.RoomService.BroadcastMessage(message)
+			s.RoomService.Publish(message)
 
 			clients := h.Rooms[message.Room]
 			for client := range clients {
@@ -69,4 +76,8 @@ func (s *HubService) Run(h *app.Hub) {
 			}
 		}
 	}
+}
+
+func (s *HubService) Subscribe(h *app.Hub) {
+	go s.RoomService.Subscribe(h)
 }

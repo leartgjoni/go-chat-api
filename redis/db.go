@@ -12,7 +12,7 @@ func Open(addr, password string) (*DB, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     addr,
 		Password: password,
-		DB:       0,  // use default DB
+		DB:       0, // use default DB
 	})
 
 	if _, err := client.Ping().Result(); err != nil {

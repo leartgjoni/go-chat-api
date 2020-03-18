@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/leartgjoni/go-chat-api/http"
+	"github.com/leartgjoni/go-chat-api/redis"
 	"github.com/leartgjoni/go-chat-api/websocket"
 	"github.com/spf13/viper"
 	"io"
@@ -35,6 +37,7 @@ func main() {
 
 // Main represents the main program execution.
 type Main struct {
+	NodeId     string // represents this process
 	ConfigPath string
 	Config     Config
 
@@ -49,6 +52,7 @@ type Main struct {
 // NewMain returns a new instance of Main.
 func NewMain() *Main {
 	return &Main{
+		NodeId: uuid.New().String(),
 		Stdin:  os.Stdin,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
@@ -77,21 +81,29 @@ func (m *Main) LoadConfig() error {
 	}
 
 	m.Config = Config{
-		// Todo
+		RedisAddr:     viper.GetString("REDIS_ADDR"),
+		RedisPassword: viper.GetString("REDIS_PASSWORD"),
+		Port:          viper.GetString("PORT"),
 	}
 
 	return nil
 }
 
 func (m *Main) Run() error {
-	// Todo: connect db
+	redisDb, err := redis.Open(m.Config.RedisAddr, m.Config.RedisPassword)
+	if err != nil {
+		fmt.Println(m.Stderr, err)
+		os.Exit(1)
+	}
 
-	clientService := websocket.NewClientService()
-	hubService := websocket.NewHubService()
+	roomService := redis.NewRoomService(redisDb, m.NodeId)
+
+	clientService := websocket.NewClientService(m.NodeId)
+	hubService := websocket.NewHubService(roomService)
 
 	// Initialize Http server.
 	httpServer := http.NewServer()
-	httpServer.Addr = ":8080"
+	httpServer.Addr = fmt.Sprintf(":%s", m.Config.Port)
 
 	httpServer.ClientService = clientService
 	httpServer.HubService = hubService
@@ -105,7 +117,7 @@ func (m *Main) Run() error {
 	// Assign close function.
 	m.closeFn = func() error {
 		_ = httpServer.Close()
-		// Todo: close db
+		_ = redisDb.Close()
 		return nil
 	}
 
@@ -113,5 +125,7 @@ func (m *Main) Run() error {
 }
 
 type Config struct {
-	// Todo
+	RedisAddr     string
+	RedisPassword string
+	Port          string
 }

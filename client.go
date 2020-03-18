@@ -4,6 +4,7 @@ import "github.com/gorilla/websocket"
 
 type Client struct {
 	ID   string
+	Name string
 	Room string
 	Conn *websocket.Conn
 	Hub  *Hub

@@ -60,6 +60,7 @@ func (s *Server) initializeHandlers() {
 		Broadcast:  make(chan app.Message),
 	}
 
+	s.HubService.Subscribe(hub)
 	go s.HubService.Run(hub)
 
 	s.websocketHandler = NewWebsocketHandler(s.ClientService, hub)

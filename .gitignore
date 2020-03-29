@@ -1,5 +1,5 @@
 coverage.out
 coverage-*.out
-*.env
-!(test.env)
+local.env
+.env
 profile.cov

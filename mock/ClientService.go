@@ -1,12 +1,14 @@
 package mock
 
-import app "github.com/leartgjoni/go-chat-api"
+import (
+	app "github.com/leartgjoni/go-chat-api"
+)
 
 type ClientService struct {
 	ReadPumpFn func(client *app.Client)
 	ReadPumpInvoked bool
 
-	WritePumpFn func(hub *app.Client)
+	WritePumpFn func(client *app.Client)
 	WritePumpInvoked bool
 }
 

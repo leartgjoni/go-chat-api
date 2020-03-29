@@ -12,12 +12,14 @@ var _ app.RoomService = &RoomService{}
 type RoomService struct {
 	db     *DB
 	NodeId string
+	closeCh chan int
 }
 
-func NewRoomService(db *DB, NodeId string) *RoomService {
+func NewRoomService(db *DB, NodeId string, closeCh chan int) *RoomService {
 	return &RoomService{
 		db:     db,
 		NodeId: NodeId,
+		closeCh: closeCh,
 	}
 }
 
@@ -92,13 +94,19 @@ func (s RoomService) Subscribe(hub *app.Hub) {
 	// Go channel which receives messages.
 	ch := pubsub.Channel()
 
-	// Consume messages.
-	for msg := range ch {
-		message := app.Message{}
-		json.Unmarshal([]byte(msg.Payload), &message)
+	for {
+		select {
+		case <-s.closeCh:
+			// shut down goroutine on close channel
+			_ = pubsub.Close()
+			return
+		case msg := <- ch:
+			message := app.Message{}
+			json.Unmarshal([]byte(msg.Payload), &message)
 
-		if message.NodeId != s.NodeId {
-			hub.Broadcast <- message
+			if message.NodeId != s.NodeId {
+				hub.Broadcast <- message
+			}
 		}
 	}
 }

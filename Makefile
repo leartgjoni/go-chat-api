@@ -3,6 +3,8 @@ start-local:
 init-db:
 	docker-compose -f scripts/env/docker-compose.yml up -d
 	docker-compose -f scripts/env/docker-compose-test.yml up -d
+init-ci-env:
+	docker-compose -f scripts/env/docker-compose-test.yml up -d
 test:
 	ENV_FILE=test.env go test -v ./...
 test-unit:

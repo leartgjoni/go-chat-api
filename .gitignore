@@ -1,4 +1,5 @@
 coverage.out
+coverage.txt
 coverage-*.out
 local.env
 .env

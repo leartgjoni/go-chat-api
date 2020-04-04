@@ -3,10 +3,10 @@ package mock
 import app "github.com/leartgjoni/go-chat-api"
 
 type HubService struct {
-	RunFn func(hub *app.Hub)
+	RunFn      func(hub *app.Hub)
 	RunInvoked bool
 
-	SubscribeFn func(hub *app.Hub)
+	SubscribeFn      func(hub *app.Hub)
 	SubscribeInvoked bool
 }
 
@@ -19,5 +19,3 @@ func (s *HubService) Subscribe(hub *app.Hub) {
 	s.SubscribeInvoked = true
 	s.SubscribeFn(hub)
 }
-
-

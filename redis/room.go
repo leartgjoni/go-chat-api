@@ -10,15 +10,15 @@ import (
 var _ app.RoomService = &RoomService{}
 
 type RoomService struct {
-	db     *DB
-	NodeId string
+	db      *DB
+	NodeId  string
 	closeCh chan int
 }
 
 func NewRoomService(db *DB, NodeId string, closeCh chan int) *RoomService {
 	return &RoomService{
-		db:     db,
-		NodeId: NodeId,
+		db:      db,
+		NodeId:  NodeId,
 		closeCh: closeCh,
 	}
 }
@@ -100,7 +100,7 @@ func (s RoomService) Subscribe(hub *app.Hub) {
 			// shut down goroutine on close channel
 			_ = pubsub.Close()
 			return
-		case msg := <- ch:
+		case msg := <-ch:
 			message := app.Message{}
 			json.Unmarshal([]byte(msg.Payload), &message)
 

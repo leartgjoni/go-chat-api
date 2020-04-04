@@ -12,12 +12,10 @@ import (
 )
 
 func TestWebsocketHandler_Handle(t *testing.T) {
-	t.Skip("temp")
-
 	var ReadPumpArg, WritePumpArg *app.Client
-	cs := &mock.ClientService{ReadPumpFn: func(client *app.Client) {ReadPumpArg = client}, WritePumpFn: func(client *app.Client) {WritePumpArg = client}}
+	cs := &mock.ClientService{ReadPumpFn: func(client *app.Client) { ReadPumpArg = client }, WritePumpFn: func(client *app.Client) { WritePumpArg = client }}
 
-	hub := &app.Hub{Register:   make(chan *app.Client)}
+	hub := &app.Hub{Register: make(chan *app.Client)}
 	var client *app.Client
 	// read from the Register channel
 	go func() {

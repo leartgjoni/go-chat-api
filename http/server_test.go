@@ -12,8 +12,6 @@ import (
 )
 
 func TestServerListeningIntegration(t *testing.T) {
-	t.Skip("temp")
-
 	if testing.Short() {
 		t.Skip("skipping integration test")
 	}
@@ -25,7 +23,6 @@ func TestServerListeningIntegration(t *testing.T) {
 	hs.RunFn = func(hub *app.Hub) {}
 	hs.SubscribeFn = func(hub *app.Hub) {}
 	server.HubService = &hs
-
 
 	if err := server.Start(); err != nil {
 		t.Fatal("Error on server.Open()", err)

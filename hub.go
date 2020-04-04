@@ -15,7 +15,7 @@ type Hub struct {
 	Unregister chan *Client
 	Rooms      map[string]map[*Client]bool
 	Broadcast  chan Message
-	Mux sync.Mutex
+	Mux        sync.Mutex
 }
 
 type HubService interface {

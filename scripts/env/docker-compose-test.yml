@@ -1,0 +1,7 @@
+version: '3'
+services:
+  redis-test:
+    container_name: redis-test
+    image: 'redis'
+    ports:
+      - 6381:6379

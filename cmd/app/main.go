@@ -46,6 +46,7 @@ type Main struct {
 	Stdout io.Writer
 	Stderr io.Writer
 
+	closeCh chan int
 	closeFn func() error
 }
 
@@ -57,6 +58,7 @@ func NewMain() *Main {
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
 
+		closeCh: make(chan int),
 		closeFn: func() error { return nil },
 	}
 }
@@ -96,7 +98,7 @@ func (m *Main) Run() error {
 		os.Exit(1)
 	}
 
-	roomService := redis.NewRoomService(redisDb, m.NodeId)
+	roomService := redis.NewRoomService(redisDb, m.NodeId, m.closeCh)
 
 	clientService := websocket.NewClientService(m.NodeId)
 	hubService := websocket.NewHubService(roomService)
@@ -116,6 +118,7 @@ func (m *Main) Run() error {
 
 	// Assign close function.
 	m.closeFn = func() error {
+		m.closeCh <- 0
 		_ = httpServer.Close()
 		_ = redisDb.Close()
 		return nil

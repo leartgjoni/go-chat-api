@@ -35,7 +35,7 @@ jobs:
             token: ${{ secrets.CODECOV_TOKEN }}
   release:
     name: Push to AWS ECR
-#    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'
     needs: test
     runs-on: ubuntu-latest
     steps:

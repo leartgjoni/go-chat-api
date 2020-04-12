@@ -1,9 +1,4 @@
-FROM golang:1.13.10-alpine3.11
-
-ARG PORT
-ARG REDIS_ADDR
-ENV PORT=${PORT}
-ENV REDIS_ADDR=${REDIS_ADDR}
+FROM golang:1.13.10-alpine3.11 as builder
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
@@ -19,8 +14,18 @@ COPY . .
 # Build the Go app
 RUN go build -o ./build/go-chat-api ./cmd/app
 
+
+FROM alpine
+
+COPY --from=builder /app/build/go-chat-api /app/go-chat-api
+
+ARG PORT
+ARG REDIS_ADDR
+ENV PORT=${PORT}
+ENV REDIS_ADDR=${REDIS_ADDR}
+
 # This container exposes port ${PORT} to the outside world
 EXPOSE ${PORT}
 
 # Run the binary program produced by `go install`
-CMD ["./build/go-chat-api"]
+ENTRYPOINT ["/app/go-chat-api"]

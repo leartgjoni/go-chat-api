@@ -1,0 +1,10 @@
+coverage.out
+coverage.txt
+coverage-*.out
+*.env
+profile.cov
+
+.git
+.gitignore
+
+*_test.go

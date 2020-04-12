@@ -19,7 +19,7 @@ COPY . .
 # Build the Go app
 RUN go build -o ./build/go-chat-api ./cmd/app
 
-# This container exposes port 8080 to the outside world
+# This container exposes port ${PORT} to the outside world
 EXPOSE ${PORT}
 
 # Run the binary program produced by `go install`

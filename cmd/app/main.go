@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/leartgjoni/go-chat-api/http"
@@ -79,13 +80,17 @@ func (m *Main) LoadConfig() error {
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
-		return err
+		fmt.Println("no config file present. will default to env variables")
 	}
 
 	m.Config = Config{
 		RedisAddr:     viper.GetString("REDIS_ADDR"),
 		RedisPassword: viper.GetString("REDIS_PASSWORD"),
 		Port:          viper.GetString("PORT"),
+	}
+
+	if m.Config.RedisAddr == "" || m.Config.Port == "" {
+		return errors.New("missing configs")
 	}
 
 	return nil

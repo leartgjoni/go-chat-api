@@ -19,13 +19,5 @@ FROM alpine
 
 COPY --from=builder /app/build/go-chat-api /app/go-chat-api
 
-ARG PORT
-ARG REDIS_ADDR
-ENV PORT=${PORT}
-ENV REDIS_ADDR=${REDIS_ADDR}
-
-# This container exposes port ${PORT} to the outside world
-EXPOSE ${PORT}
-
 # Run the binary program produced by `go install`
 ENTRYPOINT ["/app/go-chat-api"]

@@ -1,9 +1,9 @@
-name: build
+name: Test and Deploy
 on: [push]
 jobs:
 
-  build:
-    name: Test & Build
+  test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
 
@@ -33,5 +33,21 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
             token: ${{ secrets.CODECOV_TOKEN }}
-      - name: Build
-        run: go build -v .
+  release:
+    name: Push to AWS ECR
+    if: github.ref == 'refs/heads/master'
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - uses: kciter/aws-ecr-action@v1
+        with:
+          access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          account_id: ${{ secrets.AWS_ACCOUNT_ID }}
+          repo: ${{ secrets.ECR_REPO }}
+          region: ${{ secrets.AWS_REGION }}
+          tags: latest,${{ github.sha }}
+          extra_build_args: --build-arg PORT=${{secrets.PORT}} --build-arg REDIS_ADDR=${{secrets.REDIS_ADDR}}

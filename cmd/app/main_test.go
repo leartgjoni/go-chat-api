@@ -12,9 +12,14 @@ func TestMainIntegration(t *testing.T) {
 		t.Skip("skipping integration test")
 	}
 
+	m := NewMain()
+
+	if err := m.LoadConfig(); err == nil {
+		t.Fatal("should fail without env variables", err)
+	}
+
 	_ = os.Setenv("CONFIG_PATH", "../../test.env")
 
-	m := NewMain()
 	if err := m.LoadConfig(); err != nil {
 		t.Fatal("cannot load config", err)
 	}

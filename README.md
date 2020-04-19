@@ -18,4 +18,4 @@ make start-local
 ```
 
 #### Demo
-<img src="https://raw.githubusercontent.com/leartgjoni/go-chat-api/master/demo/demo.gif" />
+<img src="https://raw.githubusercontent.com/leartgjoni/go-chat-api/master/demo/demo.gif?token=AD5TBXFF7TFIC4EM32BI7LK6TTRU6" />

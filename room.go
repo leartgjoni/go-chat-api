@@ -4,7 +4,7 @@ type Action int
 
 const (
 	ActionRegister   Action = 0
-	ActionUnregister Action = 1
+	ActionUnregister Action = 2
 )
 
 type RoomService interface {
